@@ -1,0 +1,510 @@
+---
+title: "Data in R."
+author: "Katlyn H. Degamo"
+date: "2023-05-09"
+output: pdf_document
+---
+
+```{r}
+
+ #To store something in R session, you will assign it a name using <- operator. 
+ #You can assign your previous calculation to an object called my_sum.
+ #Simple calculation like this.
+
+3 + 3
+my_sum <- 4 + 4
+my_sum
+my_sum + 5
+
+ #To display the value, the name of the object must be typed, the *print()* command or 
+ #used the command should be wrapped in parenthesis.
+
+my_sum
+print(my_sum)
+(another_sum <- 7 + 8)
+(new_sum <- my_sum + 5)
+```
+
+## Data Types
+
+```{r}
+ #The typeof function can be used to see the type of a single scalar value.
+ #integer can be signified by adding an 'L' to the end.
+ #Numeric data can be integer form or double form.
+
+my_integer <- 2L
+typeof(my_integer)
+my_double <- 5.94
+typeof(my_double)
+ 
+ #Character data is text data sorrounded by single or doule qoutes.
+my_character <- "HI I'M THE PROBLEM"
+typeof(my_character)
+ 
+ #Logical data takes the form TRUE or FALSE.
+
+my_logical <- FALSE
+typeof(my_logical)
+```
+
+## Homogeneous Data Structures
+
+```{r}
+ #Vectors are one-dimensional structures containing data of the same type, 
+ #notated by using c().
+ #Type of vector can also be viewed using the typeof function, 
+ #but str function can be used to display both contents and its type.
+
+double_vector <- c(1.2, 2.3, 3.4, 45, 56, 7)
+typeof(double_vector)
+str(double_vector)
+ 
+ #Categorical data which takes only a finite number of possible values.
+
+categories <- factor(c("A", "B", "C", "A", "A", "C"))
+str(categories)
+categories_char <- c("A", "B", "C", "A", "A", "C")
+str(categories)
+
+ #If needed, the factors can be given order.
+ #Character vector.
+
+ranking <- c("Medium", "High", "Low")
+str(ranking)
+
+ #turn it into ordered factor.
+
+ranking_factors <- ordered(ranking, levels = c("Low", "Medium", "High"))
+str(ranking_factors)
+
+ #number of elements in a vector can be seen using the length() function.
+
+length(categories)
+categories
+length(ranking_factors)
+
+ #simple numeric sequence vectors can be created using shorthand notation.
+
+(my_sequence <- 1:10)
+seq(1, 10, 2)
+seq(2, 20, 2)
+seq(from = 1, to = 20, by = 5)
+
+ #numeric sequence vector.
+ #create a new vector containing vec and the character "HELLO".
+ #numeric values have been coerced into their character equivalents.
+
+vec <- 1:10
+str(vec)
+new_vec <- c(vec, "HELLO")
+str(new_vec)
+
+ #attempt a mixed logical and numeric.
+ #logical has been converted to binary numeric (TRUE = 1)
+ #try to add a numeric to our previous categories factor vector.
+ #categories have been coerced to background integer representations.
+
+vec[1] + vec [2]
+mix <- c(TRUE, 6)
+str(mix)
+new_categories <- c(categories,1)
+str(new_categories)
+str(categories)
+
+ #Matrices are two-dimensional data structures of the same type and 
+ #are built from a vector by defining the number of rows and columns.
+
+(m <- matrix(c(1, 2, 3, 4), nrow = 2, ncol = 2))
+(m <- matrix(vec, nrow = 5, ncol = 2))
+```
+
+## Heterogeneous Data Structure
+
+```{r}
+ #List are one-dimensional data structures that can take data of any type.
+
+my_list <- list(6, TRUE, "HELLO")
+str(my_list)
+new_list <- list(scalar = 6, some_vec = c("HELLO"), some_mat = matrix(1:4, nrow = 2, ncol = 4))
+str(new_list)
+new_list[[3]]
+new_list[[2]]
+new_list[[1]]
+
+ #named list elements can be accessed by using $.
+
+new_list$scalar
+new_list$some_vec
+new_list$some_mat
+
+ #Data frames - are the most used data structure in R; 
+          #very similar in nature to a typical database table or spreadsheet.
+          #two vectors of different types but same length.
+
+names <- c("John", "Ayesha")
+ages <- c(31, 24)
+
+ #Create a data frame.
+
+(df <- data.frame(names, ages))
+
+ #Get types of columns
+
+str(df)
+
+ #Get dimensions of df
+
+dim(df)
+```
+
+# Working with Dataframes
+
+```{r}
+ #Dataframes is the most common data structure used by analysts in R.
+ #R facilitates numerous ways of importing data from simple .csv files, from Excel files
+  #from online sources or from databases.
+```
+
+## Loading and tidying data in dataframes
+
+```{r} 
+ #Let's load the salespeople data set, which contains some information on the sales,
+  #average customer ratings and performance ratings of salespeople.
+ #read.csv() function can accept a URL address of the file if it is online.
+
+ #url of data set
+ #dataframe called salespeople
+
+data()
+url <- "https://raw.githubusercontent.com/msuiitdmsgabriel/datasets-regression/main/salespeople.csv"
+salespeople <- read.csv(url)
+
+ #View the dimensions.
+
+dim(salespeople)
+
+ #If it is too big to display, we can use head() function.
+
+head(salespeople)
+
+ #If we wanted to see the 6th entry of sales column.
+ #We can view a specific column by using $, and we can use brackets to view specific entry.
+
+salespeople$sales[6]
+salespeople[34, 4]
+salespeople
+
+ #We can take a look at the data types using str().
+
+str(salespeople)
+
+ #We can also see a statistical summary of each column using summary().
+ #Missing data is identified by a special NA value in R.
+
+summary(salespeople)
+
+ #The function is.na() will look at all values in a vector or dataframe 
+ #and return TRUE or FALSE 
+  #based on whether they are NA or not.
+
+is.na(salespeople)
+
+ #By adding these up using the sum() function, it will take TRUE as 1 and FALSE as 0,
+  #which effectively provides a count of missing data.
+
+sum(is.na(salespeople))
+
+ #The easiest way is to use the complete.cases() function, 
+ #which identifies the rows that have no NAs, 
+  #and then we can select those rows from the dataframe based on that conditon.
+
+complete.cases(salespeople)
+salespeople[complete.cases(salespeople),]
+salespeople <- salespeople[complete.cases(salespeople),]
+
+ #confirm no NAs.
+
+sum(is.na(salespeople))
+
+ #We can see the unique values of a vector or column using the unique() function.
+
+salespeople$performance
+unique(salespeople$performance)
+
+ #If we need to change the type of a column in a dataframe, we can use the 
+  # as.numeric(), as.character(), as.logical() or as.factor() functions.
+
+as.factor(salespeople$performance)
+str(salespeople)
+salespeople$performance <- as.factor(salespeople$performance)
+str(salespeople)
+```
+
+## Manipulating dataframes
+
+```{r}
+ #Dataframes can be subsetted to contain only rows that satisfy specific conditions.
+url <- "https://raw.githubusercontent.com/msuiitdmsgabriel/datasets-regression/main/salespeople.csv"
+salespeople <- read.csv(url)
+
+(sales_720 <- subset(salespeople, subset = sales == 720))
+
+ #Note the use of ==, which is used in many programming languages, 
+  #to test for precise equality.
+
+unique((salespeople$sales))
+
+ #Similarly we can select columns based on inequalities
+
+(subset(salespeople, subset = sales >=700))
+high_sales <- subset(salespeople, subset = sales >= 700)
+head(high_sales)
+
+ #To select specific columns use the select argument.
+
+salespeople_sales_perf <- subset(salespeople, select = c("sales", "performance"))
+head(salespeople_sales_perf)
+
+ #bind the rows of low_sales and high_sales together.
+
+low_sales <- subset(salespeople, subet = sales < 400)
+low_and_high_sales = rbind(low_sales, high_sales)
+head(low_and_high_sales)
+head(high_sales)
+
+ #Two dataframes with two columns each.
+ #Bind the columns to create a dataframe with four columns.
+
+sales_perf <- subset(salespeople, select = c("sales", "performance"))
+prom_custrate <- subset(salespeople, select = c("promoted", "customer_rate"))
+full_df <- cbind(sales_perf, prom_custrate)
+head(full_df)
+
+ #In the code so far we have used a variety of functions.
+ #Exampe head(), subset(), rbind().
+ 
+ #Functions exist to perform common useful operations.
+ 
+ #Often there are a large number of arguments that a function can take,
+  #but many are optional and not required to be specified by the user.
+ #Example, the function head(), which displays the first rows of a dataframe
+  #has only on required argument x: the name of the dataframe.
+
+head(prom_custrate)
+head(full_df, n = 5)
+
+head(x = salespeople)
+head(x = salespeople, n=4)
+
+ #When running a function, you can either specify the arguments by name or 
+  #you can enter them in order without their names.
+
+ #see fewer rows - arguments to be in the right order if not named.
+
+head(salespeople, 3)
+head(salespeople, 6)
+
+ #or if you don't know the right order name your arguments 
+ #and you can put them in any order.
+
+head(n=3, x = salespeople)
+head(n=6, x = salespeople)
+```
+
+# Functions, packages and libraries
+
+```{r}
+ #Most functions in R have excellent help documentations
+ #To get help on the head() function, type help(head) or ?head.
+
+?head
+help(head)
+ 
+ #Alternatively you can open the Help browser window directly in RStudio 
+ #and do a search there.
+```
+
+## Writing your own functions
+
+```{r}
+ #Functions are not limited to those that come packaged in R.
+ #Users can write their own functions to perform tasks 
+ #that are helpful to their objectives.
+
+ #In this example, a simple function is written 
+ #which generates a report on a dataframe
+
+df_report <- function(df){paste("This dataframe contains", nrow(df), "rows and", ncol(df), "columns. 
+                                There are", sum(is.na(df)), "NA entries.")}
+
+ #We can test our function by using the built-in mtcars data set in R.
+
+df_report(mtcars)
+paste("This is how the paste", "functioning works")
+df_report(iris)
+```
+
+## Installing packages
+
+```{r setup, include=FALSE}
+ #A package is an additional module that can be installed easily.
+ #we will be using functions from both base R and from popular and useful packages.
+ #a popular package used for statistical modeling is the MASS package, 
+ #which  is based on methods in a popular applied statistics book.
+
+#install.packages("MASS")
+library(MASS)
+ #a popular package used for statistical modeling is the MASS package, 
+ #which is based on methods in a popular applied statistics book.
+
+my_packages <- c("DescTools", "dplyr")
+#install.packages(my_packages)
+library(DescTools, dplyr)
+```
+
+##  Using packages
+
+```{r}
+ #Once you have installed a package into your package library, 
+ #to use it in your R session you need to load it using the library() function
+
+library(MASS)
+help(package = "MASS")
+
+ #Once a package is loaded from your library, 
+ #you can use any of the functions inside it.
+
+#MASS::stepAIC()
+```
+### The pipe operator
+
+```{r}
+url <- "https://raw.githubusercontent.com/msuiitdmsgabriel/datasets-regression/main/salespeople.csv"
+salespeople <- read.csv(url)
+
+ #The pipe operator makes code more natural to read and write and reduces 
+ #the typical computing problem of many nested operations inside parentheses.
+
+sample(14,14)
+sales <- subset(salespeople , subset = sales < 500)
+
+ #take the mean of those values
+
+mean(sales$sales)
+mean(subset(salespeople$sales, subset = salespeople$sales < 500))
+mean(subset(salespeople, subset = sales < 500)$sales)
+
+ #load magrittr library to get the pipe operator
+
+library(magrittr)
+subset(salespeople$sales, subset = salespeople$sales < 500) %>% 
+mean() 
+round(mean(subset(salespeople, subset = sales < 500)$sales))
+```
+
+# Errors, warnings and messages
+
+```{r}
+url <- "https://raw.githubusercontent.com/msuiitdmsgabriel/datasets-regression/main/salespeople.csv"
+salespeople <- read.csv(url)
+
+ #Errors are serious problems which usually result in the halting of your code 
+ #and a failure to return your requested output.
+
+ #subset(salespeople, subset = sales = 720) - the equal sign should be double
+
+subset(salespeople, subset = sales == 720)  
+
+ #head[salespeople] - parentheses, not brackets
+
+head(salespeople)
+
+ #Warnings are less serious and usually alert you to something that 
+ #you might be overlooking and which could indicate a problem with the output.
+ #Messages are pieces of information that may 
+ #or may not be useful to you ata particular point in time. 
+```
+
+#  Plotting and graphing
+
+```{r}
+ #there are numerous ways to plot and graph information in R. 
+ #graphical output will be rendered in the Plots pane, 
+ #where you can copy it  or save it as an image.
+```
+
+##  Plotting in base R
+
+```{r}
+url <- "https://raw.githubusercontent.com/msuiitdmsgabriel/datasets-regression/main/salespeople.csv"
+salespeople <- read.csv(url)
+
+ #The simplest plot function in base R is plot(). This performs basic X-Y plotting.
+ #Note the use of the arguments main, xlab and ylab 
+ #for customizing the axis labels and title for the plot.
+
+plot(x = salespeople$sales, y = salespeople$customer_rate)
+
+plot(x = salespeople$sales, y = salespeople$customer_rate,
+     xlab = "Sales ($m)", ylab = "Average customer rating",
+     main = "Scatterplot of Sales vs Customer Rating")
+
+  #Histograms of data can be generated using the hist() function.
+  #Note the use of breaks to customize how the bars appear.
+
+hist(salespeople$performance)
+hist(salespeople$performance,
+     xlab = "Performance Rating", 
+     main = "Histogram of Performance Ratings")
+
+hist(salespeople$performance, breaks = 0:4,
+     xlab = "Performance Rating", 
+     main = "Histogram of Performance Ratings")
+
+ #Box and whisker plots are excellent ways to see the distribution of a variable, 
+ #and can be grouped against another variable to see bivariate       patterns.
+ #Note the use of the formula and data notation here to define the variable 
+ #we are interested in and how we want it grouped. 
+
+boxplot(formula = sales ~ performance, data = salespeople)
+
+boxplot(formula = sales ~ performance, data = salespeople,
+        xlab = "Performance Rating", ylab = "Sales ($m)",
+        main = "Boxplot of Sales by Performance Rating")
+
+```
+
+## Specialist plotting and graphing packages
+
+```{r}
+ #the most commonly used specialist plotting and graphing package in R is ggplot2.
+ #ggplot2 allows the flexible construction of a very wide range of charts and  graphs, 
+ #but uses a very specific command grammar which can take some getting  used to.
+
+#install.packages("ggplot2")
+library(ggplot2)
+ #The plotly package allows the use of the plotly graphing library in R. 
+ #This is an excellent package for interactive graphing 
+ #and is used for 3D illustrations in this book.
+
+#install.packages("plotly")
+
+ #GGally is a package that extends ggplot2 to allow easy combination of charts and graphs. 
+ #One of its most popular functions is ggpairs(), which produces a pairplot. 
+
+install.packages("GGally")
+
+url <- "https://raw.githubusercontent.com/msuiitdmsgabriel/datasets-regression/main/salespeople.csv"
+salespeople <- read.csv(url)
+salespeople$promoted <- as.factor(salespeople$promoted)
+salespeople$performance <- as.factor(salespeople$performance)
+GGally::ggpairs(salespeople)
+```
+
+# References
+
+- [ Venables, W. N., and B. D. Ripley. 2002. Modern Applied Statistics with s.Wickham, Hadley. 2016. ggplot2: Elegant Graphics for Data Analysis.](https://ggplot2-book.org/)
+- [Wickham, Hadley, and Garrett Grolemund. 2016. R for Data Science.]( https://r4ds.had.co.nz/)
+- [Xie, Yihui, Christophe Dervieux, and Emily Riederer. 2020. R Markdown Cookbook.](https://bookdown.org/yihui/rmarkdown-cookbook/)
+- [salespeople](https://raw.githubusercontent.com/msuiitdmsgabriel/datasets-regression/main/salespeople.csv)
+ 
